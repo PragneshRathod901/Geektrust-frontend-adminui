@@ -1,0 +1,27 @@
+.tableHead {
+    font-weight: bold;
+    background-color: #85B8FF;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+tr {
+    border: 1px  solid #dddddd;
+    text-align: left;
+    padding: 0.2rem;
+}
+.tableRow{
+    background-color: white;
+}
+.tableRow:hover{
+    background-color: #CCE0FF;
+}
+.tableRow:active{
+    background-color: #85B8FF;
+}
+.tableRow.checked{
+    background-color: #E9F2FF;
+}

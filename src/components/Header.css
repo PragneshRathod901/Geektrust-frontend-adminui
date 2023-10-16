@@ -1,0 +1,27 @@
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
+}
+.SearchBar{
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    background-color: aliceblue;
+    
+    
+}
+.SearchBar>input{
+    border: none;
+    font-size:1.5rem;
+    padding: .5rem;
+    background-color: unset;
+}
+.SearchBar > input:focus{
+    /* border-color: #1990FF; */
+    border: none;
+    background-color: unset;
+    outline:none;
+    
+}

@@ -1,0 +1,6 @@
+.flexContainer button{
+    margin-right: .5rem;
+    height: 2.25rem;
+    width: 2.25rem;
+    box-sizing: border-box;
+}

@@ -1,0 +1,98 @@
+.primary{
+    background-color: #001528;
+    color: #EFE6FC;
+    accent-color: #001528;
+    position: relative;
+}
+/* for checkbox indeterminate state */
+.primary:indeterminate::before{
+  content: '';
+  width: 100%; 
+  height: 100%; 
+  background-color: #001528;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+}
+.primary:indeterminate::after{
+  content: '';
+  width: 50%; 
+  height: 4px; 
+  background-color: #EFE6FC;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+}
+.primary:not(div):hover{
+    background-color: #9A6FF0;
+}
+.primary:not(div):active{
+    background-color: #430EE1;
+}
+
+.normal{
+    background-color: rgb(255, 255, 255);
+    color: #000000;
+    
+}
+.normal:not(div):hover{
+    background-color: rgb(200, 200, 200);
+}
+.normal:not(div):active{
+    background-color: rgb(150, 150, 150);
+}
+
+.secondary{
+    background-color: #1990FF;
+    color: #EFE6FC;
+}
+.secondary:not(div):hover{
+    background-color: #3cb0fd;
+}
+.secondary:not(div):active{
+    background-color: #0759a5;
+}
+.error-tag{
+    background-color: #f44336;
+    color: #FFF;
+}
+.error-tag:not(div):hover{
+    background-color: #e57373;
+}
+.error-tag:not(div):active{
+    background-color: #af2828;
+}
+.success{
+    background-color: #05c21e;
+    color: #FFF;
+}
+button {
+    border: none;
+    text-align: center;
+    border-radius: 12px;
+    padding: .5rem;
+}
+button:hover{
+    cursor: pointer;
+}
+.round12{
+    border-radius: 12px;
+}
+.round4{
+    border-radius: 4px;
+}
+.boxShadow{
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+input[type="checkbox"]{
+    width: 1.5em;
+	height: 1.5em;
+}
+
+.flexContainer{
+    display: flex;
+}

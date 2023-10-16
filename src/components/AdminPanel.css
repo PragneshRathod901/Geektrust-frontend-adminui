@@ -1,0 +1,30 @@
+.grid-container{
+    display: grid;
+    grid-template-columns: .5fr 1.25fr 1.25fr; 
+    grid-template-rows: 0.4fr 2.2fr 0.4fr;
+}
+.header{
+    grid-column: 1/ span 3;
+    grid-row: 1;
+}
+.footer{
+    grid-column: 1/ span 3;
+    grid-row: 3;
+}
+.content{
+    grid-column: 2/ span 2;
+    grid-row-start: 2;
+    padding: 1rem;
+}
+.notification{
+    display: block;
+    position: fixed;
+    top: 0.5rem;
+    left: 50%;
+    z-index: 1;
+    padding: .5rem;
+    border-radius: .8rem;
+    transform: translate(-50%, 0)
+}
+
+
