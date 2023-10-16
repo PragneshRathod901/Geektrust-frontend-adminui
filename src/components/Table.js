@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Table.css";
 import {
   DeleteForever as DeleteForeverIcon,
@@ -6,15 +6,60 @@ import {
 } from "@mui/icons-material";
 
 const Table = ({
-  doImChecked,
-  handleIntermediate,
-  SelectAllItem,
+  selectionList,
+  SetSelection,
   curItemsToDisplay,
-  UpdateSelection,
-  HandleEdit,
-  DeleteEvent,
+  editUserData,
+  deleteThisItem,
 }) => {
+  /* Handles Selection of All Items */
+  const SelectAllItem = () => {
+    if (selectionList.length === curItemsToDisplay.length) {
+      SetSelection([]);
+      return;
+    }
+    let newList = [];
+    curItemsToDisplay.forEach((item) => newList.push(item.id));
+    SetSelection(newList);
+  };
 
+  /*  Update Selection of specific Item */
+  const UpdateSelection = (itemId) => {
+    let newList = [...selectionList];
+    if (newList.includes(itemId)) {
+      newList.splice(newList.indexOf(itemId), 1);
+    } else {
+      newList.push(itemId);
+    }
+    SetSelection(newList);
+  };
+
+  /* Check if item of table is selected */
+  const doImChecked = (itemId) => selectionList.includes(itemId);
+  /* Check root Check box is  checked*/
+  const doMainCheckBoxChecked = () =>
+    selectionList.length === curItemsToDisplay.length;
+
+  /* Handles root CheckBox Intermediate State */
+  const handleIntermediate = (input) => {
+    if (input) {
+      input.indeterminate =
+        selectionList.length > 0 &&
+        selectionList.length !== curItemsToDisplay.length;
+    }
+  };
+
+  /* Handle Delete Event*/
+  const handleDeleteEvent = (dom_event, itemId) => {
+    deleteThisItem([itemId]);
+    dom_event.stopPropagation();
+  };
+
+  /* Handle Edit user data Event*/
+  const handleEditEvent = (dom_event, itemId) => {
+    editUserData(itemId);
+    dom_event.stopPropagation();
+  };
 
   return (
     <div className="table boxShadow round4">
@@ -25,7 +70,7 @@ const Table = ({
               <input
                 type="checkbox"
                 className="primary"
-                checked={doImChecked(true, "")}
+                checked={doMainCheckBoxChecked()}
                 ref={(input) => handleIntermediate(input)}
                 onChange={() => SelectAllItem()}
               />
@@ -43,14 +88,16 @@ const Table = ({
                 key={_data.id}
                 value={_data.id}
                 role="checkbox"
-                className={doImChecked(false, _data.id) ? 'tableRow checked ' : 'tableRow '}
+                className={
+                  doImChecked(_data.id) ? "tableRow checked " : "tableRow "
+                }
                 onClick={() => UpdateSelection(_data.id)}
               >
                 <td className="tablecell" align="left">
                   <input
                     type="checkbox"
                     className="primary"
-                    checked={doImChecked(false, _data.id)}
+                    checked={doImChecked(_data.id)}
                     readOnly
                   />
                 </td>
@@ -66,13 +113,13 @@ const Table = ({
                 <td className="tablecell flexContainer" align="left">
                   <button
                     className="normal"
-                    onClick={(e) => HandleEdit(e, _data.id)}
+                    onClick={(e) => handleEditEvent(e, _data.id)}
                   >
                     <EditIcon />
                   </button>
                   <button
                     className="normal"
-                    onClick={(e) => DeleteEvent(e, [_data.id])}
+                    onClick={(e) => handleDeleteEvent(e, _data.id)}
                   >
                     <DeleteForeverIcon color="error" />
                   </button>

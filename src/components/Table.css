@@ -6,6 +6,7 @@
 table {
     border-collapse: collapse;
     width: 100%;
+    overflow: hidden;
 }
 
 tr {
@@ -24,4 +25,9 @@ tr {
 }
 .tableRow.checked{
     background-color: #E9F2FF;
+}
+@media (max-width:480px){
+    table{
+        overflow-y: scroll;
+    }
 }

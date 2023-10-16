@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom/client";
 import Header from "./Header";
 import Footer from "./Footer";
 import EditForm from "./EditForm";
@@ -7,30 +6,32 @@ import Pagination from "./Pagination";
 import Table from "./Table";
 import "./AdminPanel.css";
 import axios, { Axios } from "axios";
+import { setSelectionRange } from "@testing-library/user-event/dist/utils";
 
 const AdminPanel = () => {
   let [userDataList, SetUserData] = useState([]);
   let [selectionList, SetSelection] = useState([]);
   let [searchText, SetSearchText] = useState("");
-  let [currentPgNum, SetPageNum] = useState(0);
+  let [currentPgNum, SetPageNum] = useState(-1);
   let [editModeData, SetEditMode] = useState();
   let [notification, SetNotification] = useState();
-  let [debounceTime, SetDebounceTime] = useState();
+  let [debounceTime_noti, SetDebounceTime] = useState();
   let item_per_page = 10;
   let curItemsToDisplay = [];
   let filteredUser = [];
-  let timeToHideNotification=1000;
-  
+  let timeToHideNotification = 1000;
+
   /* Fetching UserDatas */
   useEffect(() => {
     getUsers().then((res) => {
       SetUserData(res);
+      SetPageNum(0);//update of page require after data change
     });
   }, []);
 
   //send user Notification about state or error
-  const SendNotification = (notificationData) => {
-    clearTimeout(debounceTime);
+  const enqueSendNotification = (notificationData) => {
+    clearTimeout(debounceTime_noti);
     SetNotification(notificationData);
     if (notificationData) {
       let time = setTimeout(() => {
@@ -39,45 +40,15 @@ const AdminPanel = () => {
       SetDebounceTime(time);
     }
   };
-  /* Handles Update of Search Text */
-  const SearchUpdate = (e) => {
+  /* Handles Update of Search Text and reset selection*/
+  const searchTextUpdate = (e) => {
     SetSearchText(e.target.value);
     SetSelection([]);
   };
 
-  /* Handles Selection of All Items */
-  const SelectAllItem = () => {
-    if (selectionList.length === item_per_page) {
-      SetSelection([]);
-      return;
-    }
-    let newList = [];
-    curItemsToDisplay.forEach((item) => newList.push(item.id));
-    SetSelection(newList);
-  };
-  /*  Update Selection of specific Item */
-  const UpdateSelection = (itemId) => {
-    let newList = [...selectionList];
-    if (newList.includes(itemId)) {
-      newList.splice(newList.indexOf(itemId), 1);
-    } else {
-      newList.push(itemId);
-    }
-    SetSelection(newList);
-  };
   /* compare text in string */
   const checkIfKeyExist = (searchText, text) => text.includes(searchText);
-  /* Check if item is selected */
-  const doImChecked = (isMainCheckBox, itemId) => {
-    if (isMainCheckBox) {
-      return (
-        selectionList.length === item_per_page ||
-        selectionList.length === curItemsToDisplay.length
-      );
-    } else {
-      return selectionList.includes(itemId);
-    }
-  };
+
   /* Get User Data */
   const getUsers = async () => {
     try {
@@ -86,34 +57,38 @@ const AdminPanel = () => {
       );
       return res.data;
     } catch (e) {
-      SendNotification({ message: e.message, type: "error-tag" });
+      enqueSendNotification({ message: e.message, type: "error-tag" });
       return [];
     }
   };
   /* Handle Deletion of users */
-  const DeleteEvent = (event, idstoDelete) => {
+  const deleteThisUsers = (idsToDelete) => {
     let newList = [...userDataList];
-    idstoDelete.forEach((item) => {
+    let isUpdated = false;
+    idsToDelete.forEach((item) => {
       let index = newList.findIndex((a) => a.id === item);
       if (index !== -1) {
         newList.splice(index, 1);
+        isUpdated = true;
       }
     });
-    SetUserData(newList);
-    SendNotification({ message: "Items Deleted", type: "success" });
-
-    event.stopPropagation();
+    //trigger re render if deleted
+    if (isUpdated) {
+      SetUserData(newList);
+      enqueSendNotification({ message: "Items Deleted", type: "success" });
+    }
   };
+
   /* Handles Edit of User Data */
-  const HandleEdit = (event, _userId) => {
+  const startEditThisUser = (_userId) => {
     let id = userDataList.findIndex((item) => item.id === _userId);
     if (id >= 0) {
       SetEditMode({ ...userDataList[id] });
     }
-    event.stopPropagation();
   };
+
   /* Handle Saving of userData */
-  const HandleSaveUserData = (_userData) => {
+  const handleSaveUserData = (_userData) => {
     if (!_userData) {
       SetEditMode(null);
       return;
@@ -122,27 +97,20 @@ const AdminPanel = () => {
     if (id >= 0) {
       userDataList[id] = { ..._userData };
     }
-    SendNotification({ message: "user Edited", type: "success" });
+    enqueSendNotification({ message: "user Edited", type: "success" });
 
     SetEditMode(null);
   };
+
   /* Handles Page change*/
   const handleChangePage = (newPage) => {
     SetPageNum(newPage);
     SetSelection([]);
   };
-  /* Handles Main CheckBox Intermediate State */
-  const handleIntermediate = (input) => {
-    if (input) {
-      input.indeterminate =
-        selectionList.length > 0 &&
-        selectionList.length !== item_per_page &&
-        selectionList.length !== curItemsToDisplay.length;
-    }
-  };
+
   /* Handle Delete All that selected  */
-  const HandlDeleteSelected = (event) => {
-    DeleteEvent(event, selectionList);
+  const handlDeleteSelected = () => {
+    deleteThisUsers(selectionList);
     SetSelection([]);
   };
 
@@ -162,32 +130,30 @@ const AdminPanel = () => {
   );
   return (
     <div className="grid-container">
-      <Header searchText={searchText} SetSearchFn={SearchUpdate} />
+      <Header searchText={searchText} SetSearchFn={searchTextUpdate} />
       <div>
         {editModeData && (
           <EditForm
             currentUserData={editModeData}
-            saveUserData={HandleSaveUserData}
+            saveUserData={handleSaveUserData}
           />
         )}
       </div>
       {notification && (
         <button
           className={`notification ${notification.type}`}
-          onClick={() => SendNotification(null)}
+          onClick={() => enqueSendNotification(null)}
         >
           {notification.message}
         </button>
       )}
       <div className="content">
         <Table
-          doImChecked={doImChecked}
-          handleIntermediate={handleIntermediate}
-          SelectAllItem={SelectAllItem}
+          selectionList={selectionList}
+          SetSelection={SetSelection}
           curItemsToDisplay={curItemsToDisplay}
-          UpdateSelection={UpdateSelection}
-          HandleEdit={HandleEdit}
-          DeleteEvent={DeleteEvent}
+          editUserData={startEditThisUser}
+          deleteThisItem={deleteThisUsers}
         />
       </div>
       <Footer
@@ -196,18 +162,15 @@ const AdminPanel = () => {
             key="deletButton"
             variant="contained"
             className="error-tag"
-            onClick={HandlDeleteSelected}
+            onClick={handlDeleteSelected}
           >
             Delete Selected
           </button>,
           <Pagination
             key="pagination"
-            PageCount={Math.ceil((filteredUser.length - 1) / item_per_page)}
+            pageCount={Math.ceil((filteredUser.length - 1) / item_per_page)}
             pageNumber={currentPgNum}
             SetPageNumber={handleChangePage}
-            showFirstButton
-            showLastButton
-            color="secondary"
           />,
         ]}
       />

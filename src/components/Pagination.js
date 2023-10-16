@@ -1,51 +1,81 @@
-import React from 'react';
-import { NavigateBefore,NavigateNext ,LastPage,FirstPage } from '@mui/icons-material';
-import './Pagination.css'
+import React ,{useEffect} from "react";
+import {
+  NavigateBefore,
+  NavigateNext,
+  LastPage,
+  FirstPage,
+} from "@mui/icons-material";
+import "./Pagination.css";
 
-const Pagination=({pageNumber,SetPageNumber,PageCount})=>{
-    let pageButtons=[];
-    let numberOfButtonsToDisplay=3;
-    const handleChangePage=(pageNum)=>{
-        if(pageNum>=0 && pageNum<PageCount)
-        {
-        SetPageNumber(pageNum);
-        }
+const Pagination = ({ pageNumber, SetPageNumber, pageCount }) => {
+  let pageButtons = [];
+  let numberOfButtonsToDisplay = 3;
+
+  //handles page change event
+  const handleChangePage = (pageNum) => {
+    if (pageNum >= 0 && pageNum < pageCount) {
+      SetPageNumber(pageNum);
     }
-    const Initialize=()=>{
-        if(pageNumber>numberOfButtonsToDisplay-1 && PageCount>numberOfButtonsToDisplay )
-        {
-            let startId=(PageCount-pageNumber)<numberOfButtonsToDisplay?PageCount-numberOfButtonsToDisplay:pageNumber;
-            pageButtons.push(<button key={0} className={'normal'} onClick={()=>handleChangePage(0)}>{(1).toString()}</button>);
-            pageButtons.push(<button key={'...'} >{'...'}</button>);
-            
-            for(let i=0;i<numberOfButtonsToDisplay;i++){
-                let classname=startId===pageNumber?"secondary":'normal';
-                pageButtons.push(<button key={startId} className={classname} onClick={()=>handleChangePage(startId)}>{(startId+1).toString()}</button>);
-                startId++;
-            }
-            
-        }else if(PageCount>numberOfButtonsToDisplay)
-        {
-            for(let i=0;i<numberOfButtonsToDisplay;i++){
-                let classname=i===pageNumber?"secondary":'normal';
-                pageButtons.push(<button key={i} className={classname} onClick={()=>handleChangePage(i)}>{(i+1).toString()}</button>);
-            }
-            pageButtons.push(<button key={'...'} >{'...'}</button>);
-            pageButtons.push(<button key={PageCount} className={'normal'} onClick={()=>handleChangePage(PageCount-1)}>{(PageCount).toString()}</button>);
-        }else{
-            for(let i=0;i<PageCount;i++){
-                let classname=i===pageNumber?"secondary":'normal';
-                pageButtons.push(<button key={i} className={classname} onClick={()=>handleChangePage(i)}>{(i+1).toString()}</button>);
-            }
-        }
+  };
+
+  //add number of buttons for page
+  const AddItems = (startId, count) => {
+    for (let i = 0; i < count; i++) {
+      let classname = startId === pageNumber ? "secondary" : "normal";
+      let id = startId;
+      pageButtons.push(
+        <button
+          key={id}
+          className={classname}
+          onClick={() => handleChangePage(id)}
+        >
+          {(id + 1).toString()}
+        </button>
+      );
+      startId++;
     }
-    Initialize();
-    return <div className='flexContainer'>
-        <button key={'firstpage'}  onClick={()=>handleChangePage(0)}><FirstPage /></button>
-        <button key={'prevPage'} onClick={()=>handleChangePage(pageNumber-1)}><NavigateBefore /></button>
-        {pageButtons.map((item)=>(item))}
-        <button key={"nextPage"}  onClick={()=>handleChangePage(pageNumber+1)}><NavigateNext /></button>
-        <button key={'lastPage'}  onClick={()=>handleChangePage(PageCount-1)}><LastPage /></button>
+  };
+
+  const Initialize = () => {
+    let needToAddDotAtFirst =
+      pageNumber >= numberOfButtonsToDisplay - 1 &&
+      pageCount > numberOfButtonsToDisplay;
+    let needToAddDotAtlast =
+      pageNumber + numberOfButtonsToDisplay <= pageCount &&
+      pageCount > numberOfButtonsToDisplay;
+
+    if (needToAddDotAtFirst && needToAddDotAtlast) {
+      //display at first or at both
+      pageButtons.push(<button key={"...first"}>{"..."}</button>);
+      AddItems(pageNumber - 1, numberOfButtonsToDisplay);
+    } else if (!needToAddDotAtlast && needToAddDotAtFirst) {
+      //only display .. at last
+      AddItems(pageCount - numberOfButtonsToDisplay, numberOfButtonsToDisplay);
+    } //no display of ...
+    else {
+      AddItems(0, Math.min(pageCount, numberOfButtonsToDisplay));
+    }
+    //display dot ... at last if needed
+    if (needToAddDotAtlast)
+      pageButtons.push(<button key={"...last"}>{"..."}</button>);
+  };
+  Initialize();
+  return (
+    <div className="flexContainer">
+      <button key={"firstpage"} onClick={() => handleChangePage(0)}>
+        <FirstPage />
+      </button>
+      <button key={"prevPage"} onClick={() => handleChangePage(pageNumber - 1)}>
+        <NavigateBefore />
+      </button>
+      {pageButtons.map((item) => item)}
+      <button key={"nextPage"} onClick={() => handleChangePage(pageNumber + 1)}>
+        <NavigateNext />
+      </button>
+      <button key={"lastPage"} onClick={() => handleChangePage(pageCount - 1)}>
+        <LastPage />
+      </button>
     </div>
-}
+  );
+};
 export default Pagination;

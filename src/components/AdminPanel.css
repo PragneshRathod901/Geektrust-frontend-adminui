@@ -26,5 +26,13 @@
     border-radius: .8rem;
     transform: translate(-50%, 0)
 }
-
-
+@media (max-width:480px){
+    .grid-container{
+        grid-template-columns: 1.25fr 1.25fr 1.25fr; 
+    }
+    .content{
+        grid-column: 1/ span 3;
+        grid-row-start: 2;
+        padding: 1rem;
+    }
+}
